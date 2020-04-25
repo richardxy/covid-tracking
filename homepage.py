@@ -42,7 +42,7 @@ def compute_increase_rate(data_list_confirmed, region='US'):
 
 
 def compute_death_increase_rate(data_list_deaths, region='US'):
-    print("...computing death increase rate...\n")
+    # print("...computing death increase rate...\n")
     # data_list_deaths, date_list = utl.load_data_4(region)
     A = data_list_deaths[region]
     # print("confirmed data is ", A)
@@ -126,9 +126,9 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
     return html.Div(
         [
             dbc.Row([
-                dbc.Col([
-                    html.Div(html.H1("CADSEA - Covid 19 Analysis")),
-                ])
+                dbc.Col(
+                    dbc.Alert(html.Div(html.H1("CADSEA - Covid 19 Analysis")),color="dark"),
+                width={"size": 4, "offset": 3})
             ]
             ),
             # dbc.Row([
@@ -276,11 +276,12 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                         ],
                         value='US',
                         clearable=False,
+                        
                     ),
                     ],
 
                     )
-                ]
+                ],width = 2,
                 )
             ]
             ),
