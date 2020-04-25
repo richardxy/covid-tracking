@@ -142,17 +142,6 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                 dbc.Col([
                     html.Span(
                         [
-                            html.H5(["US Death", dbc.Badge(data_list_deaths["US"][-1], color="danger", className="ml-1"),
-                                     dbc.Badge("+" + str(data_list_deaths["US"][-1] - data_list_deaths["US"][-2]),
-                                               color="danger",
-                                               className="ml-1")]),
-                        ]
-                    ),
-                ]
-                ),
-                dbc.Col([
-                    html.Span(
-                        [
                             html.H5(
                                 ["US Confirmed", dbc.Badge(data_list_confirmed["US"][-1], color="warning", className="ml-1"),
                                  dbc.Badge("+" + str(data_list_confirmed["US"][-1] - data_list_confirmed["US"][-2]),
@@ -161,22 +150,21 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                         ]
                     ),
                 ]
-                )
-            ]
-            ),
-            dbc.Row([
+                ),
                 dbc.Col([
                     html.Span(
                         [
-                            html.H5(["Italy Death",
-                                     dbc.Badge(data_list_deaths["Italy"][-1], color="danger", className="ml-1"),
-                                     dbc.Badge("+" + str(data_list_deaths["Italy"][-1] - data_list_deaths["Italy"][-2]),
+                            html.H5(["US Death", dbc.Badge(data_list_deaths["US"][-1], color="danger", className="ml-1"),
+                                     dbc.Badge("+" + str(data_list_deaths["US"][-1] - data_list_deaths["US"][-2]),
                                                color="danger",
                                                className="ml-1")]),
                         ]
                     ),
                 ]
                 ),
+            ]
+            ),
+            dbc.Row([
                 dbc.Col([
                     html.Span(
                         [
@@ -189,22 +177,23 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                         ]
                     ),
                 ]
-                )
-            ]
-            ),
-            dbc.Row([
+                ),
                 dbc.Col([
                     html.Span(
                         [
-                            html.H5(["China Death",
-                                     dbc.Badge(data_list_deaths["China"][-1], color="danger", className="ml-1"),
-                                     dbc.Badge("+" + str(data_list_deaths["China"][-1] - data_list_deaths["China"][-2]),
+                            html.H5(["Italy Death",
+                                     dbc.Badge(data_list_deaths["Italy"][-1], color="danger", className="ml-1"),
+                                     dbc.Badge("+" + str(data_list_deaths["Italy"][-1] - data_list_deaths["Italy"][-2]),
                                                color="danger",
                                                className="ml-1")]),
                         ]
                     ),
                 ]
                 ),
+                
+            ]
+            ),
+            dbc.Row([
                 dbc.Col([
                     html.Span(
                         [
@@ -217,22 +206,23 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                         ]
                     ),
                 ]
-                )
-            ]
-            ),
-            dbc.Row([
+                ),
                 dbc.Col([
                     html.Span(
                         [
-                            html.H5(["Canada Death",
-                                     dbc.Badge(data_list_deaths["Canada"][-1], color="danger", className="ml-1"),
-                                     dbc.Badge("+" + str(data_list_deaths["Canada"][-1] - data_list_deaths["Canada"][-2]),
+                            html.H5(["China Death",
+                                     dbc.Badge(data_list_deaths["China"][-1], color="danger", className="ml-1"),
+                                     dbc.Badge("+" + str(data_list_deaths["China"][-1] - data_list_deaths["China"][-2]),
                                                color="danger",
                                                className="ml-1")]),
                         ]
                     ),
                 ]
                 ),
+                
+            ]
+            ),
+            dbc.Row([
                 dbc.Col([
                     html.Span(
                         [
@@ -245,7 +235,20 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                         ]
                     ),
                 ]
-                )
+                ),
+                dbc.Col([
+                    html.Span(
+                        [
+                            html.H5(["Canada Death",
+                                     dbc.Badge(data_list_deaths["Canada"][-1], color="danger", className="ml-1"),
+                                     dbc.Badge("+" + str(data_list_deaths["Canada"][-1] - data_list_deaths["Canada"][-2]),
+                                               color="danger",
+                                               className="ml-1")]),
+                        ]
+                    ),
+                ]
+                ),
+                
             ]
             ),
             dbc.Row([
@@ -339,7 +342,7 @@ def update_figure(value):
 @app.callback(
     Output('increase rate', 'figure'),
     [Input('Region_of_interest', 'value')])
-def update_figure(value):
+def update_rate_figure(value):
     data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest = load_case_list_regions()
     return {
         "data": [{"x": date_list,
