@@ -42,13 +42,14 @@ def get_slopes(df_Confirmed, country, column_name='Country/Region',patten='/20',
     five_days = []
     values = []
     for i in range(0, len(dates) - window_size):
+        tmp_dt = df_tmp['date'].iloc[i:i+window_size].tolist()
         tmp_x = df_tmp['days_since_basedate'].iloc[i:i+window_size].tolist()
         tmp_y = us_cases[i:i+window_size]
         xs = np.array(tmp_x, dtype=np.float64)
         ys = np.array(tmp_y, dtype=np.float64)
         mean_y = np.average(ys)
         slopes.append(best_fit_slope(xs,ys)/mean_y if mean_y>0 else 0)
-        five_days.append(xs[-1])
+        five_days.append(tmp_dt[-1])
         values.append(ys)
         # df_5d = pd.DataFrame({'fivedate':five_days,'slope':slopes})    
     rec = {'Country':country, 'five-date':five_days,'slope':slopes,'value':values}
