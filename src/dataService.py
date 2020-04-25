@@ -1,14 +1,12 @@
 import numpy as np
 import pandas as pd
 import os
-
-from datetime import date
-from datetime import timedelta
-
+import numpy as np 
+from statistics import mean
+from datetime import datetime,date, timedelta
 from re import findall
 import requests
 # import plotly.express as px
-
 
 class dataServiceCSSE:
     '''
@@ -217,12 +215,12 @@ class dataServiceCSBS(object):
             c.columns = ['County_Name', 'State_Name', date]
 
             Confirmed = pd.merge(Confirmed, c,
-                                 how='left',
+                                 how='outer',
                                  on=['County_Name', 'State_Name'])
 
             d = data[['County_Name', 'State_Name', 'Death']]
             d.columns = c.columns
-            Deaths = pd.merge(Deaths, d, how='left',
+            Deaths = pd.merge(Deaths, d, how='outer',
                              on=['County_Name', 'State_Name'])
 
             self.all_date_range.append(date)
@@ -259,6 +257,25 @@ class dataServiceCSBS(object):
         return ret
 
     def refresh_category(self, category: str, date_window_option, region_of_interest):
+        # refresh data as per :category, date list and region of interest
+        df = self.dataSet[category].copy()
+
+        self.date_list = self.date_range(date_window_option)
+
+        ret = []
+        for region in region_of_interest:
+            #print("region is ", region)
+            df_1 = df[df['State_Name'] == region]
+            df_1 = df_1.fillna(0)
+            # print(df_1.columns)
+            counts = list(np.sum(np.array(df_1[self.date_list]), axis=0))
+            counts = [int(x) for x in counts]
+            ret.append({'x': self.date_list, 'y': counts,
+                     'name': region,'mode':'lines+markers'   })
+
+        return ret
+
+    def get_increase_rate(self, category: str, date_window_option, region_of_interest):
         # refresh data as per :category, date list and region of interest
         df = self.dataSet[category].copy()
 
