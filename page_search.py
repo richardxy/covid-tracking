@@ -1,4 +1,6 @@
 import math
+
+import dash_table
 import plotly.express as px
 
 import dash
@@ -22,14 +24,12 @@ from plotly.validators.scatter.marker import SymbolValidator
 
 raw_symbols = SymbolValidator().values
 
-
 # navigation bar
 nav = Navbar()
 geoSvr = geoClass()
 newsSvr = newsClass()
 
 figs = {}  # save curent fig, incase invalid zipcode inputed
-
 
 header = html.H3(
     'Choose a zipcode and find nearby status.'
@@ -51,33 +51,120 @@ radiusInput = dcc.Input(
     style=dict(display='flex', justifyContent='center', width='30'),
 )
 
-
 inputDiv = html.Div([
-    html.H4('ZipCode:'),
+    html.P('ZipCode:'),
     zipcodeInput,
-    html.H4(' Radius:'),
+    html.P(' Radius:'),
     radiusInput,
     html.Button(id='submit_zipcode_radius', n_clicks=0, children='GO'),
-    html.H4(id='inputMsg', children='', style={'color': 'red'})
+    html.P(id='inputMsg', children='', style={'color': 'red'})
 ], style=dict(display='flex'))
 
+confirmedNearby = html.Div(id='confirmedNearby', )
 
-confirmedNearby = html.Div(id='confirmedNearby',)
+deathsNearby = html.Div(id='deathsNearby', )
 
-deathsNearby = html.Div(id='deathsNearby',)
+confirmedTable = html.Div(id='confirmedTable', )
+
+deathsTable = html.Div(id='deathsTable', )
 
 localNews = html.Div(id='localNews')
+
+
+def load_body():
+    return html.Div(
+        [
+            dbc.Row([
+                dbc.Col([
+                    html.Div(html.H1("Neighbourhood")
+                             ),
+                ]
+                )
+            ]
+            ),
+            dbc.Row([
+                dbc.Col([
+                    html.Div(html.P("Type your Zipcode and Find Nearby Status: "),
+                             ),
+                ]
+                ),
+                dbc.Col(
+                    html.Div([
+                        html.H6('ZipCode: '),
+                        zipcodeInput,
+                        html.H6(' Radius: '),
+                        radiusInput,
+                        html.Button(id='submit_zipcode_radius', n_clicks=0, children='GO'),
+                        html.H6(id='inputMsg', children='', style={'color': 'red'})
+                    ], style={'display':'flex','vertical-align': 'right'}),
+                 ),
+            ]),
+            dbc.Row([html.Div([
+                html.H1('empty row'), 
+                ],
+                style={'color': 'white'})]),
+            dbc.Row([
+                dbc.Col([
+                    html.Div(html.P("Confirmed Cases")
+                             ),
+                ]
+                ),
+                dbc.Col([
+                    html.Div(html.P("Death Cases")
+                             ),
+
+                ],
+                ),
+
+            ]
+            ),
+            dbc.Row([
+                dbc.Col([
+                    html.Div(confirmedNearby,
+                             ),
+                ]
+                ),
+                dbc.Col([
+                    html.Div(deathsNearby,
+                             ),
+
+                ],
+                ),
+
+            ]
+            ),
+            dbc.Row([
+                dbc.Col([
+                    html.Div(confirmedTable,
+                             ),
+                ]
+                ),
+                dbc.Col([
+                    html.Div(deathsTable,
+                             ),
+
+                ],
+                ),
+
+            ]
+            ),
+        ],
+        style={"border": "20px white solid"}  ##TODO
+    )
 
 
 def App():
     layout = html.Div([
         nav,
-        header,
-        inputDiv,
-        html.H3('Confirmed Cases'),
-        confirmedNearby,
-        html.H3("Deaths cases"),
-        deathsNearby,
+        # header,
+        # inputDiv,
+        load_body(),
+        # html.H3('Confirmed Cases'),
+        # confirmedNearby,
+        # html.H3("Deaths cases"),
+        # deathsNearby,
+        # confirmedTable,
+        # deathsTable,
         html.H3("Related news"),
         localNews
     ])
@@ -87,6 +174,8 @@ def App():
 @app.callback(
     [Output(component_id='confirmedNearby', component_property='children'),
      Output(component_id='deathsNearby', component_property='children'),
+     Output(component_id='confirmedTable', component_property='children'),
+     Output(component_id='deathsTable', component_property='children'),
      Output(component_id='localNews', component_property='children'),
      Output(component_id='inputMsg', component_property='children'),
      ],
@@ -102,12 +191,13 @@ def update_map_and_news(n_clicks, zipcode, radius):
     radius = float(radius)
 
     return plot_figure('Confirmed', zipcode, radius), \
-        plot_figure('Deaths', zipcode, radius), \
-        newsSvr.show_news_list(zipcode, radius), None
+           plot_figure('Deaths', zipcode, radius), \
+           data_table('Confirmed', zipcode, radius), \
+           data_table('Deaths', zipcode, radius), \
+           newsSvr.show_news_list(zipcode, radius), None
 
 
 def plot_figure(category, zipcode, radius):
-
     df = geoSvr.geo_data(category, zipcode, radius)
 
     fig = px.scatter_mapbox(df,
@@ -129,12 +219,33 @@ def plot_figure(category, zipcode, radius):
     fig.update_layout(hoverlabel=dict())
 
     graph = dcc.Graph(
-        figure=fig,
+        figure=fig
+
     )
 
     figs[category] = graph
 
     return graph
+
+
+def data_table(category, zipcode, radius):
+    df = geoSvr.geo_data(category, zipcode, radius)
+    df = df[['County_Name', category]]
+    return dash_table.DataTable(
+        # id='table',
+        columns=[{"name": i, "id": i} for i in df.columns],
+        data=df.to_dict('records'),
+        style_cell={'textAlign': 'center'},
+        style_as_list_view=True,
+        style_header={
+            'backgroundColor': 'white',
+            'fontWeight': 'bold'
+        },
+        style_table={
+            'maxHeight': '300px',
+            'overflowY': 'scroll'
+        },
+    )
 
 
 print('.... Page_search loaded, id(geoSvr):{}, id(newsSvr):{}'.format(
