@@ -140,7 +140,7 @@ class geoClass:
 
         df = self.ds.dataSet[category].copy()
 
-        df = df[['County_Name', 'Latitude',
+        df = df[['County_Name', 'State_Name','Latitude',
                  'Longitude', self.ds.latest_date]].fillna(0)
         df = df.rename(columns={self.ds.latest_date: category})
 

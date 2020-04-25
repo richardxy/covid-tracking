@@ -56,6 +56,7 @@ inputDiv = html.Div([
     zipcodeInput,
     html.P(' Radius:'),
     radiusInput,
+    html.P('miles'),
     html.Button(id='submit_zipcode_radius', n_clicks=0, children='GO'),
     html.P(id='inputMsg', children='', style={'color': 'red'})
 ], style=dict(display='flex'))
@@ -76,8 +77,7 @@ def load_body():
         [
             dbc.Row([
                 dbc.Col([
-                    html.Div(html.H1("Neighbourhood")
-                             ),
+                    html.Div(html.H1("Neighbourhood")),
                 ]
                 )
             ]
@@ -94,6 +94,7 @@ def load_body():
                         zipcodeInput,
                         html.H6(' Radius: '),
                         radiusInput,
+                        html.H6('miles'),
                         html.Button(id='submit_zipcode_radius', n_clicks=0, children='GO'),
                         html.H6(id='inputMsg', children='', style={'color': 'red'})
                     ], style={'display':'flex','vertical-align': 'right'}),
@@ -105,13 +106,11 @@ def load_body():
                 style={'color': 'white'})]),
             dbc.Row([
                 dbc.Col([
-                    html.Div(html.P("Confirmed Cases")
-                             ),
+                    dbc.Badge(html.Div(html.H6("Confirmed Cases")),pill=True, color='primary'),
                 ]
                 ),
                 dbc.Col([
-                    html.Div(html.P("Death Cases")
-                             ),
+                    dbc.Badge(html.Div(html.H6("Death Cases")),pill=True, color='danger'),
 
                 ],
                 ),
@@ -148,6 +147,16 @@ def load_body():
 
             ]
             ),
+            dbc.Row([dbc.Col([html.H3("Related news"),], width={'size':3, 'offset':5})]),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            localNews
+                        ], width = {'size':6,'offset':3},
+                    )
+                ], 
+            )
         ],
         style={"border": "20px white solid"}  ##TODO
     )
@@ -166,35 +175,48 @@ def App():
         # confirmedTable,
         # deathsTable,
         html.H3("Related news"),
-        localNews
+        # localNews
     ])
     return layout
 
 
 @app.callback(
-    [Output(component_id='confirmedNearby', component_property='children'),
+    [
+    Output(component_id='confirmedNearby', component_property='children'),
      Output(component_id='deathsNearby', component_property='children'),
      Output(component_id='confirmedTable', component_property='children'),
      Output(component_id='deathsTable', component_property='children'),
-     Output(component_id='localNews', component_property='children'),
-     Output(component_id='inputMsg', component_property='children'),
+    #  Output(component_id='localNews', component_property='children'),
+    #  Output(component_id='inputMsg', component_property='children'),
      ],
-    [Input('submit_zipcode_radius', 'n_clicks')],
+    [Input(component_id='zipcodeInput', component_property='value'),
+     Input('radiusInput', 'value')])
+def update_map_and_news(zipcode, radius):
+    # print('---------- type(newsSvr):{} ----------------'.format(type(newsSvr) ) )
+    if len(zipcode) == 5:
+        radius = float(radius)
+    # plot_figure('Confirmed', zipcode, radius), \
+            # plot_figure('Deaths', zipcode, radius), \
+        return plot_figure('Confirmed', zipcode, radius), \
+            plot_figure('Deaths', zipcode, radius), \
+            data_table('Confirmed', zipcode, radius), \
+            data_table('Deaths', zipcode, radius), \
+            # newsSvr.show_news_list(zipcode, radius), \
+        
+
+@app.callback(
+    # Output(component_id='confirmedNearby', component_property='children'),
+    #  Output(component_id='deathsNearby', component_property='children'),
+    #  Output(component_id='confirmedTable', component_property='children'),
+    #  Output(component_id='deathsTable', component_property='children'),
+     Output(component_id='localNews', component_property='children'),
+    #  Output(component_id='inputMsg', component_property='children'),
+    [Input('confirmedNearby', 'children')],
     [State(component_id='zipcodeInput', component_property='value'),
      State('radiusInput', 'value')])
-def update_map_and_news(n_clicks, zipcode, radius):
-    # print('---------- type(newsSvr):{} ----------------'.format(type(newsSvr) ) )
-    if len(zipcode) != 5:
-        print('Wrong Zip code...')
-        return figs['Confirmed'], figs['Deaths'], None, 'Wrong Zip Code...'
-
-    radius = float(radius)
-
-    return plot_figure('Confirmed', zipcode, radius), \
-           plot_figure('Deaths', zipcode, radius), \
-           data_table('Confirmed', zipcode, radius), \
-           data_table('Deaths', zipcode, radius), \
-           newsSvr.show_news_list(zipcode, radius), None
+def update_news(v, zipcode, radius):
+    print('zipcode:{}, radius:{}'.format(zipcode, radius))
+    return newsSvr.show_news_list(zipcode, float(radius))
 
 
 def plot_figure(category, zipcode, radius):
@@ -230,19 +252,31 @@ def plot_figure(category, zipcode, radius):
 
 def data_table(category, zipcode, radius):
     df = geoSvr.geo_data(category, zipcode, radius)
-    df = df[['County_Name', category]]
+    df['county_state'] = df['County_Name']+', '+df['State_Name']
+    df = df[['county_state', category]]
     return dash_table.DataTable(
         # id='table',
         columns=[{"name": i, "id": i} for i in df.columns],
         data=df.to_dict('records'),
-        style_cell={'textAlign': 'center'},
+        style_cell_conditional=[
+            {
+                'if': {'column_id': c},
+                'textAlign': 'center'
+            } for c in df.columns
+        ],
+        style_data_conditional=[
+            {
+                'if': {'row_index': 'odd'},
+                'backgroundColor': 'rgb(248, 248, 248)'
+            }
+        ],
         style_as_list_view=True,
         style_header={
             'backgroundColor': 'white',
             'fontWeight': 'bold'
         },
         style_table={
-            'maxHeight': '300px',
+            'maxHeight': '600px',
             'overflowY': 'scroll'
         },
     )
