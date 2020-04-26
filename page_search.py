@@ -46,7 +46,7 @@ zipcodeInput = dcc.Input(
 radiusInput = dcc.Input(
     placeholder='Enter a radius(miles)...',
     type='text',
-    value='100',
+    value='50',
     id='radiusInput',
     style=dict(display='flex', justifyContent='center', width='30'),
 )

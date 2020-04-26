@@ -40,17 +40,6 @@ def compute_increase_rate(data_list_confirmed, region='US'):
     rate = np.diff(np.array(A))
     return rate
 
-
-# def compute_death_increase_rate(data_list_deaths, region='US'):
-#     # print("...computing death increase rate...\n")
-#     # data_list_deaths, date_list = utl.load_data_4(region)
-#     A = data_list_deaths[region]
-#     # print("confirmed data is ", A)
-#     # rate = [(A[k + 1] - A[k]) / A[k] * 100 if A[k] > 0 else 0 for k in range(0, len(A) - 1)]
-#     rate = np.diff(np.array(A))
-#     return rate
-
-
 def load_date_list_2(region='US'):
     data_list_confirmed, date_list = utl.load_data_3(region)
     # print("region is {}, date from {} ~ {}".format(
@@ -125,8 +114,8 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
         [
             dbc.Row([
                 dbc.Col(
-                    dbc.Alert(html.Div(html.H1("CADSEA - Covid 19 Analysis")),color="dark"),
-                width={"size": 4, "offset": 3})
+                    html.Div(html.H2("CADSEA - Covid 19 Analysis")),
+              )
             ]
             ),
             # dbc.Row([
@@ -354,11 +343,11 @@ def update_rate_figure(value):
                   'mode': 'lines+markers',
                   'name': 'Smoothed Confirmed'},
                  {"x": date_list,
-                  "y": compute_death_increase_rate(data_list_deaths,value),
+                  "y": compute_increase_rate(data_list_deaths,value),
                   'mode': "lines+markers",
                   'name': value + " Death"},
                  {"x": date_list,
-                  "y": smooth_list(compute_death_increase_rate(data_list_deaths,value),
+                  "y": smooth_list(compute_increase_rate(data_list_deaths,value),
                                    9,
                                    2),
                   'mode': "lines+markers",

@@ -53,7 +53,7 @@ def load_body():
                         html.Div(dcc.Dropdown(
                             id='Recovery Time',
                             options=[{'label':'1', 'value':1},{'label':'2','value':2}, {'label':'4','value':4}],
-                            value=2,
+                            value=4,
                             multi=False
 
                         ))
