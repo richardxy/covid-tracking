@@ -41,14 +41,14 @@ def compute_increase_rate(data_list_confirmed, region='US'):
     return rate
 
 
-def compute_death_increase_rate(data_list_deaths, region='US'):
-    # print("...computing death increase rate...\n")
-    # data_list_deaths, date_list = utl.load_data_4(region)
-    A = data_list_deaths[region]
-    # print("confirmed data is ", A)
-    # rate = [(A[k + 1] - A[k]) / A[k] * 100 if A[k] > 0 else 0 for k in range(0, len(A) - 1)]
-    rate = np.diff(np.array(A))
-    return rate
+# def compute_death_increase_rate(data_list_deaths, region='US'):
+#     # print("...computing death increase rate...\n")
+#     # data_list_deaths, date_list = utl.load_data_4(region)
+#     A = data_list_deaths[region]
+#     # print("confirmed data is ", A)
+#     # rate = [(A[k + 1] - A[k]) / A[k] * 100 if A[k] > 0 else 0 for k in range(0, len(A) - 1)]
+#     rate = np.diff(np.array(A))
+#     return rate
 
 
 def load_date_list_2(region='US'):
@@ -65,26 +65,24 @@ def smooth_list(l, window=3, poly=1):
 
 def update_increase_rate_row(region="US"):
     data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest = load_case_list_regions()
+    confirmed_inc = compute_increase_rate(data_list_confirmed, region)
+    death_inc = compute_increase_rate(data_list_deaths, region)
     return dbc.Row([dbc.Col([
         dcc.Graph(id='increase rate',
                   figure={"data": [{"x": date_list[1:], # load_date_list_2(region),
-                                    "y": compute_increase_rate(data_list_confirmed, region),
+                                    "y": confirmed_inc,
                                     'mode': "lines+markers",
                                     'name': region + " Confirmed"},
                                    {"x": date_list[1:], #load_date_list_2(region),
-                                    "y": smooth_list(compute_increase_rate(data_list_confirmed, region),
-                                                     9,
-                                                     2),
+                                    "y": smooth_list(confirmed_inc, 5, 2),
                                     'mode': 'lines+markers',
                                     'name': 'Smoothed Confirmed'},
                                    {"x": date_list[1:], #load_date_list_2(region),
-                                    "y": compute_death_increase_rate(data_list_deaths,region),
+                                    "y": death_inc,
                                     'mode': "lines+markers",
                                     'name': region + " Death"},
                                    {"x": date_list[1:], # load_date_list_2(region),
-                                    "y": smooth_list(compute_death_increase_rate(data_list_deaths,region),
-                                                     9,
-                                                     2),
+                                    "y": smooth_list(death_inc, 5, 2),
                                     'mode': "lines+markers",
                                     'name': 'Smoothed Death'},
                                    ],

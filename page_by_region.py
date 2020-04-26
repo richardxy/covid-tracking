@@ -9,7 +9,7 @@ import numpy as np
 from statistics import mean
 from datetime import datetime,date, timedelta
 from navbar import Navbar
-
+from scipy.signal import savgol_filter
 from init import app
 
 from src.dataService import dataServiceCSBS as CSBS
@@ -111,6 +111,13 @@ deathsGraph = html.Div(id='deaths_region_graph',
                        children=[],
                        )
 
+confirmedDailyIncGraph = html.Div(id='comfirmed_dailyinc_graph',
+                          children=[],
+                          )
+deathsDailyIncGraph = html.Div(id='deaths_dailyinc_graph',
+                       children=[],
+                       )
+
 confirmedIncRateGraph = html.Div(id='comfirmed_incrate_graph',
                           children=[],
                           )
@@ -126,6 +133,7 @@ def App():
         
         dbc.Row([dbc.Col(radioItems, width = 6)]),
         dbc.Row([dbc.Col(confirmedGraph,width=6), dbc.Col(deathsGraph,width=6)]),
+        dbc.Row([dbc.Col(confirmedDailyIncGraph,width=6), dbc.Col(deathsDailyIncGraph,width=6)]),
         dbc.Row([dbc.Col(confirmedIncRateGraph,width=6), dbc.Col(deathsIncRateGraph,width=6)]),
 
     ])
@@ -135,6 +143,8 @@ def App():
 @app.callback(
     [Output(component_id='comfirmed_region_graph', component_property='children'),
      Output(component_id='deaths_region_graph', component_property='children'),
+     Output(component_id='comfirmed_dailyinc_graph', component_property='children'),
+     Output(component_id='deaths_dailyinc_graph', component_property='children'),
      Output(component_id='comfirmed_incrate_graph', component_property='children'),
      Output(component_id='deaths_incrate_graph', component_property='children'),
      Output(component_id='time_range', component_property='children'),
@@ -156,6 +166,8 @@ def update_graph(date_window_option, region_of_interest):
 
     return plot_figure(confirmed, 'Confirmed', dt_range), \
         plot_figure(deaths, 'Deaths', dt_range), \
+        plot_inc_number(ds,'Confirmed', region_of_interest), \
+        plot_inc_number(ds,'Deaths',region_of_interest), \
         plot_increase(ds,'Confirmed', region_of_interest), \
         plot_increase(ds,'Deaths',region_of_interest), \
         'Time Window:{}'.format(dt_range)
@@ -193,6 +205,48 @@ def plot_increase(ds, category,region_of_interest):
                 title='{} increase rate over date<br>'.format(
                     category),
                 yaxis={'title': 'Population'},
+                hovermode='closest'
+            )
+        }
+    )
+    return graph
+
+def compute_increase_number(df_Confirmed, country, column_name, pattern='2020-'):
+    # print("...computing death increase rate...\n")
+    # data_list_deaths, date_list = utl.load_data_4(region)
+    us_df = df_Confirmed[df_Confirmed[column_name]==country].fillna(0)
+    dates = [c for c in us_df.columns if pattern in c]
+    us_df_s = us_df[dates].sum(0) ## 
+    # us_cases = [us_df_s[c] for c in dates]
+
+    # A = dataframe[region]
+    # # print("confirmed data is ", A)
+    # # rate = [(A[k + 1] - A[k]) / A[k] * 100 if A[k] > 0 else 0 for k in range(0, len(A) - 1)]
+    # rate = np.diff(np.array(A))
+    return us_df_s.diff()
+
+def smooth_list(l, window=3, poly=1):
+    return savgol_filter(l, window, poly)
+
+
+def plot_inc_number(ds,category,region_of_interest):
+    df_ds = ds.dataSet[category]
+    
+    ret = []
+    for state in region_of_interest:
+        state_incs = compute_increase_number(df_ds,state,column_name='State_Name',pattern='2020-')
+        state_smooth = smooth_list(state_incs.values.tolist(), 5, 2)
+        ret.append({'x': state_incs.index.tolist(), 'y': state_incs.values.tolist(),
+                     'name': '{} Daily Increase'.format(state),'mode':'lines+markers'})
+        ret.append({'x': state_incs.index.tolist(), 'y': state_smooth,
+                     'name': '{} Daily Increase Smoothed'.format(state),'mode':'lines+markers'})
+    graph = dcc.Graph(
+        figure={
+            'data': ret,  # data,
+            'layout': go.Layout(
+                title='Number of {} Daily Increase at {}<br>'.format(
+                    category,state),
+                yaxis={'title': 'Number'},
                 hovermode='closest'
             )
         }
