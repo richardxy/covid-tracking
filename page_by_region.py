@@ -152,7 +152,7 @@ def App():
     [Input(component_id='tab1_TimeWindow', component_property='value'),
      Input('Region_of_interest', 'value')])
 def update_graph(date_window_option, region_of_interest):
-    # ds = CSBS()
+    ds = CSBS()
     dt_range = ds.date_range_str(date_window_option)
 
     confirmed = ds.refresh_category(
