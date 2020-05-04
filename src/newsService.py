@@ -215,7 +215,7 @@ class newsClass:
             return None
 
     def show_news_list(self, zipcode="21029", radius=70):
-        colors = ['primary','secondary','success','warning','danger','info']
+        colors = ['primary', 'secondary', 'success', 'warning', 'danger', 'info']
         color_cycle = cycle(colors)
         try:
             news_list = self.get_local_news_by_zipcode(zipcode, radius)
@@ -239,7 +239,7 @@ class newsClass:
                             dbc.ListGroupItemHeading(html.H5(x['title'])),
                             dbc.ListGroupItemText(html.H6(x['publishedAt'])),
                         ],
-                        href=x['url'], target = '_blank', color=next(color_cycle)
+                        href=x['url'], target='_blank', color=next(color_cycle)
                     ) for x in news_list
                 ]
             )

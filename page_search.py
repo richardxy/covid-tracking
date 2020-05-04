@@ -97,20 +97,20 @@ def load_body():
                         html.H6('miles'),
                         html.Button(id='submit_zipcode_radius', n_clicks=0, children='GO'),
                         html.H6(id='inputMsg', children='', style={'color': 'red'})
-                    ], style={'display':'flex','vertical-align': 'right'}),
-                 ),
+                    ], style={'display': 'flex', 'vertical-align': 'right'}),
+                ),
             ]),
             dbc.Row([html.Div([
-                html.H1('empty row'), 
-                ],
+                html.H1('empty row'),
+            ],
                 style={'color': 'white'})]),
             dbc.Row([
                 dbc.Col([
-                    dbc.Badge(html.Div(html.H6("Confirmed Cases")),pill=True, color='primary'),
+                    dbc.Badge(html.Div(html.H6("Confirmed Cases")), pill=True, color='primary'),
                 ]
                 ),
                 dbc.Col([
-                    dbc.Badge(html.Div(html.H6("Death Cases")),pill=True, color='danger'),
+                    dbc.Badge(html.Div(html.H6("Death Cases")), pill=True, color='danger'),
 
                 ],
                 ),
@@ -147,18 +147,18 @@ def load_body():
 
             ]
             ),
-            dbc.Row([dbc.Col([html.H3("Related news"),], width={'size':3, 'offset':5})]),
+            dbc.Row([dbc.Col([html.H3("Related news"), ], width={'size': 3, 'offset': 5})]),
             dbc.Row(
                 [
                     dbc.Col(
                         [
                             localNews
-                        ], width = {'size':6,'offset':3},
+                        ], width={'size': 6, 'offset': 3},
                     )
-                ], 
+                ],
             )
         ],
-        style={"border": "20px white solid"}  ##TODO
+        style={"border": "20px white solid"}  # TODO
     )
 
 
@@ -182,13 +182,13 @@ def App():
 
 @app.callback(
     [
-    Output(component_id='confirmedNearby', component_property='children'),
-     Output(component_id='deathsNearby', component_property='children'),
-     Output(component_id='confirmedTable', component_property='children'),
-     Output(component_id='deathsTable', component_property='children'),
-    #  Output(component_id='localNews', component_property='children'),
-    #  Output(component_id='inputMsg', component_property='children'),
-     ],
+        Output(component_id='confirmedNearby', component_property='children'),
+        Output(component_id='deathsNearby', component_property='children'),
+        Output(component_id='confirmedTable', component_property='children'),
+        Output(component_id='deathsTable', component_property='children'),
+        #  Output(component_id='localNews', component_property='children'),
+        #  Output(component_id='inputMsg', component_property='children'),
+    ],
     [Input(component_id='zipcodeInput', component_property='value'),
      Input('radiusInput', 'value')])
 def update_map_and_news(zipcode, radius):
@@ -196,20 +196,20 @@ def update_map_and_news(zipcode, radius):
     if len(zipcode) == 5:
         radius = float(radius)
     # plot_figure('Confirmed', zipcode, radius), \
-            # plot_figure('Deaths', zipcode, radius), \
+        # plot_figure('Deaths', zipcode, radius), \
         return plot_figure('Confirmed', zipcode, radius), \
             plot_figure('Deaths', zipcode, radius), \
             data_table('Confirmed', zipcode, radius), \
             data_table('Deaths', zipcode, radius), \
             # newsSvr.show_news_list(zipcode, radius), \
-        
+
 
 @app.callback(
     # Output(component_id='confirmedNearby', component_property='children'),
     #  Output(component_id='deathsNearby', component_property='children'),
     #  Output(component_id='confirmedTable', component_property='children'),
     #  Output(component_id='deathsTable', component_property='children'),
-     Output(component_id='localNews', component_property='children'),
+    Output(component_id='localNews', component_property='children'),
     #  Output(component_id='inputMsg', component_property='children'),
     [Input('confirmedNearby', 'children')],
     [State(component_id='zipcodeInput', component_property='value'),

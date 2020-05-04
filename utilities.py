@@ -95,10 +95,10 @@ def config_geo_layout():
         # print(r['Province/State'])
         if str(r['Province/State']) != 'nan':
             return r['Province/State'] + '<br>' + \
-                   'Confirmed: ' + str(r['total'])
+                'Confirmed: ' + str(r['total'])
         else:
             return r['Country/Region'] + '<br>' + \
-                   'Confirmed: ' + str(r['total'])
+                'Confirmed: ' + str(r['total'])
 
     df_conf['text'] = df_conf.apply(get_text, axis=1)
     median_val = df_conf['total'].median()

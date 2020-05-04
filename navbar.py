@@ -7,7 +7,7 @@ def Navbar():
             dbc.NavItem(dbc.NavLink("By Region/Country", href="/by_region")),
             dbc.NavItem(dbc.NavLink("Search", href="/search")),
             dbc.NavItem(dbc.NavLink("Model/Predict", href="/model")),
-            dbc.NavItem(dbc.NavLink("CADSEA", href="http://www.cadsea.org",external_link=True, target='_blank'))
+            dbc.NavItem(dbc.NavLink("CADSEA", href="http://www.cadsea.org", external_link=True, target='_blank'))
             # dbc.DropdownMenu(
             #     nav=True,
             #     in_navbar=True,

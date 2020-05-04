@@ -10,7 +10,6 @@ import page_model
 import homepage
 
 
-
 from init import app, server
 
 

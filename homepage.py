@@ -6,7 +6,7 @@ from dash.dependencies import Output, Input
 from scipy.signal import savgol_filter
 import utilities as utl
 from init import app
-import numpy as np 
+import numpy as np
 from navbar import Navbar
 
 nav = Navbar()
@@ -21,9 +21,9 @@ def load_case_list(region="US"):
     data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest = utl.load_data_2()
     return data_list_confirmed[region]
 
-def load_case_list_regions(): ## return data for all retions-of-interest
+def load_case_list_regions():  # return data for all retions-of-interest
     data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest = utl.load_data_2()
-    return data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest 
+    return data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest
 
 
 def load_death_list(region="US"):
@@ -58,19 +58,19 @@ def update_increase_rate_row(region="US"):
     death_inc = compute_increase_rate(data_list_deaths, region)
     return dbc.Row([dbc.Col([
         dcc.Graph(id='increase rate',
-                  figure={"data": [{"x": date_list[1:], # load_date_list_2(region),
+                  figure={"data": [{"x": date_list[1:],  # load_date_list_2(region),
                                     "y": confirmed_inc,
                                     'mode': "lines+markers",
                                     'name': region + " Confirmed"},
-                                   {"x": date_list[1:], #load_date_list_2(region),
+                                   {"x": date_list[1:],  # load_date_list_2(region),
                                     "y": smooth_list(confirmed_inc, 5, 2),
                                     'mode': 'lines+markers',
                                     'name': 'Smoothed Confirmed'},
-                                   {"x": date_list[1:], #load_date_list_2(region),
+                                   {"x": date_list[1:],  # load_date_list_2(region),
                                     "y": death_inc,
                                     'mode': "lines+markers",
                                     'name': region + " Death"},
-                                   {"x": date_list[1:], # load_date_list_2(region),
+                                   {"x": date_list[1:],  # load_date_list_2(region),
                                     "y": smooth_list(death_inc, 5, 2),
                                     'mode': "lines+markers",
                                     'name': 'Smoothed Death'},
@@ -78,31 +78,31 @@ def update_increase_rate_row(region="US"):
                           'layout': {
                               'title': region + " Daily Confirmed and Death Increase Rate",
                               'background': 0000,
-                          }
-                          }),
+                  }
+                  }),
     ],
         width="auto",
     ),
     ])
 
 
-def confirmed_vs_death(data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest,region="US"):
+def confirmed_vs_death(data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest, region="US"):
     return dbc.Row([dbc.Col([
         dcc.Graph(id='confirmed cases vs death',
-                  figure={"data": [{"x": date_list, #load_date_list(),
-                                    "y": data_list_confirmed['US'], # load_case_list("US"),
+                  figure={"data": [{"x": date_list,  # load_date_list(),
+                                    "y": data_list_confirmed['US'],  # load_case_list("US"),
                                     'mode': "lines+markers",
                                     'name': 'Confirmed Cases'},
-                                   {"x": date_list, #load_date_list(),
-                                    "y": data_list_deaths, #load_death_list("US"),
+                                   {"x": date_list,  # load_date_list(),
+                                    "y": data_list_deaths,  # load_death_list("US"),
                                     'mode': "lines+markers",
                                     'name': 'Death Cases'},
                                    ],
                           'layout': {
                               'title': region + " Daily Confirmed and Death Chart",
                               'background': 0000,
-                          }
-                          }),
+                  }
+                  }),
     ],
         width="auto",
     ),
@@ -115,7 +115,7 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
             dbc.Row([
                 dbc.Col(
                     html.Div(html.H2("CADSEA - Covid 19 Analysis")),
-              )
+                )
             ]
             ),
             # dbc.Row([
@@ -177,7 +177,7 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                     ),
                 ]
                 ),
-                
+
             ]
             ),
             dbc.Row([
@@ -206,7 +206,7 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                     ),
                 ]
                 ),
-                
+
             ]
             ),
             dbc.Row([
@@ -235,7 +235,7 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                     ),
                 ]
                 ),
-                
+
             ]
             ),
             dbc.Row([
@@ -266,23 +266,23 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                         ],
                         value='US',
                         clearable=False,
-                        
+
                     ),
                     ],
 
                     )
-                ],width = 2,
+                ], width=2,
                 )
             ]
             ),
         ],
-        style={"border": "60px white solid"}  ##TODO
+        style={"border": "60px white solid"}  # TODO
     )
 
 
 # define the body layout
 def load_body(data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest):
-    
+
     return html.Div(
         [
             dbc.Row([
@@ -301,7 +301,7 @@ def load_body(data_list_confirmed, data_list_deaths, data_list_recovered, date_l
             ]
             )
         ],
-        style={"border": "20px white solid"}  ##TODO
+        style={"border": "20px white solid"}  # TODO
     )
 
 
@@ -333,7 +333,7 @@ def update_rate_figure(value):
     data_list_confirmed, data_list_deaths, data_list_recovered, date_list, region_of_interest = load_case_list_regions()
     return {
         "data": [{"x": date_list,
-                  "y": compute_increase_rate(data_list_confirmed,value),
+                  "y": compute_increase_rate(data_list_confirmed, value),
                   'mode': "lines+markers",
                   'name': value + " Confirmed"},
                  {"x": date_list,
@@ -343,11 +343,11 @@ def update_rate_figure(value):
                   'mode': 'lines+markers',
                   'name': 'Smoothed Confirmed'},
                  {"x": date_list,
-                  "y": compute_increase_rate(data_list_deaths,value),
+                  "y": compute_increase_rate(data_list_deaths, value),
                   'mode': "lines+markers",
                   'name': value + " Death"},
                  {"x": date_list,
-                  "y": smooth_list(compute_increase_rate(data_list_deaths,value),
+                  "y": smooth_list(compute_increase_rate(data_list_deaths, value),
                                    9,
                                    2),
                   'mode': "lines+markers",
