@@ -17,3 +17,5 @@ dateparser
 scipy
 dateparser
 pgeocode
+pytest
+pylint
