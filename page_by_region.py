@@ -170,8 +170,8 @@ def update_graph(date_window_option, region_of_interest):
 
     return plot_figure(confirmed, 'Confirmed', dt_range), \
         plot_figure(deaths, 'Deaths', dt_range), \
-        plot_inc_number(confirmed, region_of_interest, dt_range), \
-        plot_inc_number(deaths, region_of_interest, dt_range), \
+        plot_inc_number(confirmed, 'Confirmed', dt_range), \
+        plot_inc_number(deaths, 'Deaths', dt_range), \
         plot_increase(ds, 'Confirmed', region_of_interest), \
         plot_increase(ds, 'Deaths', region_of_interest), \
         'Time Window:{}'.format(dt_range)
