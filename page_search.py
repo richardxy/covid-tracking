@@ -439,6 +439,7 @@ def App():
      Input(component_id='county_tab1_TimeWindow', component_property='value'),
      Input('county_Region_of_interest', 'value')])
 def update_ts_graph(zipcode, radius, date_window_option='ALL', region_of_interest=[]):
+    print('zipcode: {}'.format(zipcode))
     if len(zipcode) == 5:
         radius = float(radius)
         recs = geoSvr.search_by_zipcode('Confirmed',zipcode,radius) # list of (county,state)
@@ -449,7 +450,7 @@ def update_ts_graph(zipcode, radius, date_window_option='ALL', region_of_interes
 
         if region_of_interest is None:
             region_of_interest = []
-        print('len of region_options:{}, of region_of_interest:{}'.format(region_options is None, region_of_interest is None))
+        # print('len of region_options:{}, of region_of_interest:{}'.format(region_options is None, region_of_interest is None))
         if set(region_of_interest).isdisjoint(region_options):
             region_of_interest = region_options
 
@@ -462,14 +463,14 @@ def update_ts_graph(zipcode, radius, date_window_option='ALL', region_of_interes
             date_window_option,
             region_of_interest)
 
-    return plot_ts_figure(confirmed, 'Confirmed', dt_range), \
-        plot_ts_figure(deaths, 'Deaths', dt_range), \
-        plot_inc_number(confirmed, 'Confirmed', dt_range), \
-        plot_inc_number(deaths, 'Deaths', dt_range), \
-        plot_increase(confirmed, 'Confirmed', dt_range), \
-        plot_increase(deaths, 'Deaths', dt_range), \
-        'Time Window:{}'.format(dt_range), \
-        [{'label': x, 'value': x} for x in region_options]
+        return plot_ts_figure(confirmed, 'Confirmed', dt_range), \
+            plot_ts_figure(deaths, 'Deaths', dt_range), \
+            plot_inc_number(confirmed, 'Confirmed', dt_range), \
+            plot_inc_number(deaths, 'Deaths', dt_range), \
+            plot_increase(confirmed, 'Confirmed', dt_range), \
+            plot_increase(deaths, 'Deaths', dt_range), \
+            'Time Window:{}'.format(dt_range), \
+            [{'label': x, 'value': x} for x in region_options]
         # region_defaults
 
 @app.callback(
