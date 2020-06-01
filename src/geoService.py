@@ -3,7 +3,7 @@ import numpy as np
 
 from uszipcode import SearchEngine
 from uszipcode import model
-
+import us 
 
 from src.dataService import dataServiceCSBS as CSBS
 
@@ -48,7 +48,7 @@ class geoClass:
 
         search = SearchEngine()
 
-        self.defaultZipcodeInfo = search.by_zipcode('21029')
+        self.defaultZipcodeInfo = search.by_zipcode('22030')
 
         self.defaultRadius = 70
 
@@ -104,7 +104,7 @@ class geoClass:
         return self.point(lng=zipcode_info.lng, lat=zipcode_info.lat)
 
     def get_regions(self, zipcode='22030', radius=100):
-
+        search = SearchEngine()
         zipcode_info = self.zipcodeInfo(zipcode)
 
         res = SearchEngine().query(
@@ -150,46 +150,57 @@ class geoClass:
         df = df[df['Longitude'] >= self.rectArea.left]
         df = df[df['Latitude'] <= self.rectArea.top]
         df = df[df['Latitude'] >= self.rectArea.bottom]
+        df = df[df[category]>0]
 
         return df
 
-    def search_by_zipcode(self, zipcode="21029"):
+    def search_by_zipcode(self, category='Confirmed', zipcode="21029", radius=50):
 
-        df_conf = self.ds.dataSet["Confirmed"]
+        # df_conf = self.ds.dataSet[category]
 
-        date_cols = [c for c in df_conf.columns if '/20' in c]
+        # date_cols = [c for c in df_conf.columns if '2020-' in c]
+        search = SearchEngine()
+        zipinfo = search.by_zipcode(zipcode)
+        nei = search.by_coordinates(zipinfo.lat,zipinfo.lng, radius,sort_by='dist', ascending=True,returns=100)
+        nei = list(set([(n.county, n.state) for n in nei]))
+        nei_rec = []
+        for neib in nei:
+            try:
+                county = neib[0] 
+                if 'County' in county:
+                    county = county.split('County')[0].strip()
+                state = us.states.lookup(neib[1]).name 
+                nei_rec.append((county, state))
+                # df_local = df_conf[(df_conf['County_Name']==county)&(df_conf['State_Name']==state)][date_cols] 
+                # if df_local.shape[0] > 0 and df_local.iloc[0,-1] > 0:
+                #     nei_rec['{},{}'.format(county,state)] = {'category':category,}
+            except:
+                pass
+        return nei_rec # return a list of (county, state)
 
-        nomi = pgeocode.Nominatim('us')
-        zipinfo = nomi.query_postal_code(zipcode)
-        dist_vals = df_conf.apply(row_dist, axis=1, zipinfo=zipinfo)
-        df_local = df_conf[dist_vals < 100]
-        df_local = df_local[date_cols]
+    def fetch_lat_long_by_name(self):
+        from geopy.geocoders import Nominatim
+        import pandas as pd
 
-        return df_local, date_cols
+        df_conf = pd.read_csv('../data/time_series_19-covid-Confirmed.csv')
+        df_us = df_conf[df_conf['Country/Region'] == 'US']
+        location_names = df_us['Province/State'].values.tolist()
+        geolocator = Nominatim(user_agent="corona")
+        unqueried = location_names
+        list_dict = []
+        while len(unqueried) > 0:
+            for l in location_names:
+                try:
+                    if ',' not in l:
+                        location = geolocator.geocode(l + ' State')
+                    else:
+                        location = geolocator.geocode(l)
+                    unqueried.remove(l)
+                    list_dict.append({'Province/State': l, 'Lat': location.latitude, 'Long': location.longitude})
+                except BaseException:
+                    print('time out for querying %s' % l)
 
-    # def fetch_lat_long_by_name(self):
-    #     from geopy.geocoders import Nominatim
-    #     import pandas as pd
-
-    #     df_conf = pd.read_csv('../data/time_series_19-covid-Confirmed.csv')
-    #     df_us = df_conf[df_conf['Country/Region'] == 'US']
-    #     location_names = df_us['Province/State'].values.tolist()
-    #     geolocator = Nominatim(user_agent="corona")
-    #     unqueried = location_names
-    #     list_dict = []
-    #     while len(unqueried) > 0:
-    #         for l in location_names:
-    #             try:
-    #                 if ',' not in l:
-    #                     location = geolocator.geocode(l + ' State')
-    #                 else:
-    #                     location = geolocator.geocode(l)
-    #                 unqueried.remove(l)
-    #                 list_dict.append({'Province/State': l, 'Lat': location.latitude, 'Long': location.longitude})
-    #             except BaseException:
-    #                 print('time out for querying %s' % l)
-
-    #     latlong_df = pd.DataFrame.from_records(list_dict)
+        latlong_df = pd.DataFrame.from_records(list_dict)
     #     latlong_df.to_csv('../data/lat_long_by_loc_name.csv')
 
 

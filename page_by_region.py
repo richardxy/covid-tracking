@@ -1,24 +1,35 @@
-import pandas as pd
+from datetime import date, datetime, timedelta
+from statistics import mean
 
-import plotly.graph_objects as go
+import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_bootstrap_components as dbc
-from dash.dependencies import Output, Input
 import numpy as np
-from statistics import mean
-from datetime import datetime, date, timedelta
-from navbar import Navbar
-from scipy.signal import savgol_filter
-from init import app
-
-from src.dataService import dataServiceCSBS as CSBS
+import pandas as pd
+import plotly.graph_objects as go
+from dash.dependencies import Input, Output
 from plotly.validators.scatter.marker import SymbolValidator
+from scipy.signal import savgol_filter
+
+from init import app
+from navbar import Navbar
+from src.dataService import dataServiceCSBS as CSBS
+
 
 def best_fit_slope(xs, ys):
+    """Compute the best fit slope to (xs, ys)
+
+    Arguments:
+        xs {numpy array} -- x axis
+        ys {numpy array} -- y axis
+
+    Returns:
+        float -- best fit slope
+    """
     m = (((mean(xs)*mean(ys)) - mean(xs*ys)) /
          ((mean(xs)**2) - mean(xs**2)))
     return m
+
 
 def get_slopes(df_Confirmed, country, column_name='Country/Region', patten='/20', strp='%Y-%m-%d'):
     base_date = '2020-01-15'
@@ -32,7 +43,8 @@ def get_slopes(df_Confirmed, country, column_name='Country/Region', patten='/20'
     us_cases = [us_df_s[c] for c in dates]
     df_tmp = pd.DataFrame({'date': dates, 'cases': us_cases})
     df_tmp['date'] = pd.to_datetime(df_tmp['date'])
-    df_tmp['days_since_basedate'] = (df_tmp['date'] - datetime.strptime(base_date, strp)).dt.days
+    df_tmp['days_since_basedate'] = (
+        df_tmp['date'] - datetime.strptime(base_date, strp)).dt.days
     # df_t = df_tmp[df_tmp['days_since_basedate']>=0]
     # ax = sns.lineplot(x= 'days_since_basedate', y= 'cases',data=df_t)
     # plt.show()
@@ -52,7 +64,8 @@ def get_slopes(df_Confirmed, country, column_name='Country/Region', patten='/20'
         five_days.append(tmp_dt[-1])
         values.append(ys)
         # df_5d = pd.DataFrame({'fivedate':five_days,'slope':slopes})
-    rec = {'Country': country, 'five-date': five_days, 'slope': slopes, 'value': values}
+    rec = {'Country': country, 'five-date': five_days,
+           'slope': slopes, 'value': values}
     # country_slopes.append({'Country':country, 'five-date':five_days,'slope':slopes,'value':values})
     return rec
 
@@ -78,7 +91,8 @@ def load_region_options():
     return region_options
 
 
-region_defaults = ['Virginia', 'New York', 'District of Columbia', 'Maryland']  # region_of_interest[:7]
+region_defaults = ['Virginia', 'New York',
+                   'District of Columbia', 'Maryland']  # region_of_interest[:7]
 
 # return options, defaults
 
@@ -133,12 +147,16 @@ deathsIncRateGraph = html.Div(id='deaths_incrate_graph',
 def App():
     layout = html.Div([
         nav,
-        dbc.Row([dbc.Col(header, align='center', width=2), dbc.Col(dropdown, width=9)]),
+        dbc.Row([dbc.Col(header, align='center', width=2),
+                 dbc.Col(dropdown, width=9)]),
 
         dbc.Row([dbc.Col(radioItems, width=6)]),
-        dbc.Row([dbc.Col(confirmedGraph, width=6), dbc.Col(deathsGraph, width=6)]),
-        dbc.Row([dbc.Col(confirmedDailyIncGraph, width=6), dbc.Col(deathsDailyIncGraph, width=6)]),
-        dbc.Row([dbc.Col(confirmedIncRateGraph, width=6), dbc.Col(deathsIncRateGraph, width=6)]),
+        dbc.Row([dbc.Col(confirmedGraph, width=6),
+                 dbc.Col(deathsGraph, width=6)]),
+        dbc.Row([dbc.Col(confirmedDailyIncGraph, width=6),
+                 dbc.Col(deathsDailyIncGraph, width=6)]),
+        dbc.Row([dbc.Col(confirmedIncRateGraph, width=6),
+                 dbc.Col(deathsIncRateGraph, width=6)]),
 
     ])
     return layout
@@ -147,10 +165,14 @@ def App():
 @app.callback(
     [Output(component_id='comfirmed_region_graph', component_property='children'),
      Output(component_id='deaths_region_graph', component_property='children'),
-     Output(component_id='comfirmed_dailyinc_graph', component_property='children'),
-     Output(component_id='deaths_dailyinc_graph', component_property='children'),
-     Output(component_id='comfirmed_incrate_graph', component_property='children'),
-     Output(component_id='deaths_incrate_graph', component_property='children'),
+     Output(component_id='comfirmed_dailyinc_graph',
+            component_property='children'),
+     Output(component_id='deaths_dailyinc_graph',
+            component_property='children'),
+     Output(component_id='comfirmed_incrate_graph',
+            component_property='children'),
+     Output(component_id='deaths_incrate_graph',
+            component_property='children'),
      Output(component_id='time_range', component_property='children'),
      ],
     [Input(component_id='tab1_TimeWindow', component_property='value'),
@@ -192,6 +214,7 @@ def plot_figure(df, category, dt_range):
     )
     return graph
 
+
 def plot_increase(ds, category, region_of_interest):
     df_ds = ds.dataSet[category]
 
@@ -199,7 +222,8 @@ def plot_increase(ds, category, region_of_interest):
     # county_list = df_ds['State_Name'].unique().tolist()
     ret = []
     for state in region_of_interest:
-        county_slopes = get_slopes(df_ds, state, column_name='State_Name', patten='2020-', strp='%Y-%m-%d')
+        county_slopes = get_slopes(
+            df_ds, state, column_name='State_Name', patten='2020-', strp='%Y-%m-%d')
         ret.append({'x': county_slopes['five-date'], 'y': county_slopes['slope'],
                     'name': state, 'mode': 'lines+markers'})
     graph = dcc.Graph(
@@ -217,6 +241,7 @@ def plot_increase(ds, category, region_of_interest):
 
 # def compute_increase_number(df_Confirmed, country, column_name, pattern='2020-'):
 #     return np.diff(np.array(confirmed[1]['y']))
+
 
 def smooth_list(l, window=3, poly=1):
     return savgol_filter(l, window, poly)

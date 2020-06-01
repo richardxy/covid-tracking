@@ -8,6 +8,7 @@ from re import findall
 import requests
 # import plotly.express as px
 
+
 class dataServiceCSSE:
     '''
     Instance varible list:
@@ -108,9 +109,11 @@ class dataServiceCSSE:
 
             counts = list(np.sum(np.array(df_1[date_list]), axis=0))
             counts = [int(x) for x in counts]
-            ret.append({'x': date_list, 'y': counts, 'mode': 'lines+markers', 'name': region})
+            ret.append({'x': date_list, 'y': counts,
+                        'mode': 'lines+markers', 'name': region})
 
         return ret
+
 
 class dataServiceCSBS(object):
     '''
@@ -176,7 +179,8 @@ class dataServiceCSBS(object):
         if not os.path.exists(local_data_folder):
             os.mkdir(local_data_folder)
 
-        local_data_fn = os.path.join(local_data_folder, fn[9:])  # remove prefix data/csv/
+        local_data_fn = os.path.join(
+            local_data_folder, fn[9:])  # remove prefix data/csv/
 
         try:
             Confirmed = pd.read_csv(local_data_fn, error_bad_lines=False)
@@ -195,7 +199,8 @@ class dataServiceCSBS(object):
 
         self.all_date_range = []
         Confirmed = self.read_csv(csvs[0])
-        Confirmed[['Latitude', 'Longitude']] = Confirmed[['Latitude', 'Longitude']] .astype(float)
+        Confirmed[['Latitude', 'Longitude']] = Confirmed[[
+            'Latitude', 'Longitude']] .astype(float)
 
         #Confirmed.set_index(['County_Name','State_Name'], inplace=True)
 
@@ -267,6 +272,32 @@ class dataServiceCSBS(object):
             counts = [int(x) for x in counts]
             ret.append({'x': self.date_list, 'y': counts,
                         'name': region, 'mode': 'lines+markers'})
+
+        return ret
+
+    def refresh_county_state_category(self, category: str, date_window_option, region_of_interest):
+        # refresh data as per :category, date list and region of interest
+        df = self.dataSet[category].copy()
+
+        self.date_list = self.date_range(date_window_option)
+
+        ret = []
+        for county_state in region_of_interest: # region_of_interest is a list of "county, state"
+            #print("region is ", region)
+            region = [s.strip() for s in county_state.split(',')]
+            if region[1] == 'District of Columbia':
+                region[0] = 'Washington'
+            df_1 = df[(df['State_Name'] == region[1])&(df['County_Name'] == region[0])]
+            if df_1.shape[0]== 0:
+                df_1 = df[(df['State_Name'] == region[1])&(df['County_Name'] == region[0].split(' ')[0].strip())]
+            
+            if df_1.shape[0] > 0 and df_1.iloc[0,-1]>0:
+                df_1 = df_1.fillna(0)
+            
+                counts = df_1[self.date_list].values[0].tolist()
+                counts = [int(x) for x in counts]
+                ret.append({'x': self.date_list, 'y': counts,
+                            'name': county_state, 'mode': 'lines+markers'})
 
         return ret
 

@@ -27,10 +27,8 @@ app.index_string = '''
         {%favicon%}
         {%css%}
     </head>
+    
     <body>
-    
-    
-
         <div>CADSEA 2020</div>
         {%app_entry%}
         <footer>
@@ -40,5 +38,10 @@ app.index_string = '''
         </footer>
         <div>@CADSEA 2020</div>
     </body>
+    
 </html>
 '''
+
+app.scripts.append_script({
+    "external_url": "google_advertisement.js"
+    })
