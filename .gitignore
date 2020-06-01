@@ -2,3 +2,4 @@
 .spyproject/
 *.pyc
 atop_env/
+data/CSBS/
