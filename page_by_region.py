@@ -151,12 +151,12 @@ def App():
                  dbc.Col(dropdown, width=9)]),
 
         dbc.Row([dbc.Col(radioItems, width=6)]),
-        dbc.Row([dbc.Col(confirmedGraph, width=6),
-                 dbc.Col(deathsGraph, width=6)]),
-        dbc.Row([dbc.Col(confirmedDailyIncGraph, width=6),
-                 dbc.Col(deathsDailyIncGraph, width=6)]),
-        dbc.Row([dbc.Col(confirmedIncRateGraph, width=6),
-                 dbc.Col(deathsIncRateGraph, width=6)]),
+        dbc.Row([dbc.Col(confirmedGraph, width=6)]),
+        dbc.Row([dbc.Col(deathsGraph, width=6)]),
+        dbc.Row([dbc.Col(confirmedDailyIncGraph, width=6)]),
+        dbc.Row([dbc.Col(deathsDailyIncGraph, width=6)]),
+        dbc.Row([dbc.Col(confirmedIncRateGraph, width=6)]),
+        dbc.Row([dbc.Col(deathsIncRateGraph, width=6)]),
 
     ])
     return layout

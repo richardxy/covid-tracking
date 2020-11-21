@@ -138,6 +138,9 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                     ),
                 ]
                 ),
+            ]
+            ),
+            dbc.Row([
                 dbc.Col([
                     html.Span(
                         [
@@ -165,6 +168,9 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                     ),
                 ]
                 ),
+            ]
+            ),
+            dbc.Row([
                 dbc.Col([
                     html.Span(
                         [
@@ -194,6 +200,9 @@ def load_table(data_list_confirmed, data_list_deaths, data_list_recovered, date_
                     ),
                 ]
                 ),
+            ]
+            ),
+            dbc.Row([
                 dbc.Col([
                     html.Span(
                         [
@@ -291,6 +300,9 @@ def load_body(data_list_confirmed, data_list_deaths, data_list_recovered, date_l
                              ),
                 ]
                 ),
+            ]
+            ),
+            dbc.Row([
                 dbc.Col([
                     html.Div(update_increase_rate_row('US'),
                              ),
@@ -370,6 +382,6 @@ def load_layout():
 
 
 if __name__ == "__main__":
-    app = dash.Dash(__name__, external_stylesheets=[dbc.themes.UNITED])
+    app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
     app.layout = load_layout()
     app.run_server()
