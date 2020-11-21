@@ -194,7 +194,7 @@ class dataServiceCSBS(object):
 
         git_master_url = "https://github.com/tomquisel/covid19-data/tree/master/"
 
-        csvs = findall('data/csv/2020-0[0-9-]{4}.csv',
+        csvs = findall('data/csv/2020-[0-9]{2}-[0-9]{2}.csv',
                        requests.get(git_master_url+'data/csv/').text)
 
         self.all_date_range = []

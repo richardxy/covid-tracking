@@ -32,4 +32,4 @@ def display_page(pathname):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False, port=5000)
+    app.run_server(debug=False, port=5010)
